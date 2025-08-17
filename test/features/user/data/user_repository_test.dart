@@ -22,7 +22,7 @@ void main() {
     );
     addTearDown(c.dispose);
 
-    final repo = c.read(userRepositoryProvider);
+    final repo = c.read(userRepository);
     final u = await repo.getUser(1);
     expect(u.username, 't');
   });

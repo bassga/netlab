@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:netlab/core/config/app_config.dart';
+import 'package:netlab/core/network/api_client.dart';
+import 'package:netlab/core/network/dio_provider.dart';
 import 'package:netlab/features/user/data/fake_user_data_source.dart';
+import 'package:netlab/features/user/data/remote_user_data_source.dart';
 import 'package:netlab/features/user/data/user_data_source.dart';
 import 'package:netlab/features/user/data/user_dto.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -23,6 +27,11 @@ class UserRepositoryImpl implements UserRepository {
 
 @riverpod
 UserRepository userRepository(Ref ref) {
-  // まずは Fake だけで起動確認（Remoteは次PRで差し替える）
-  return UserRepositoryImpl(FakeUserDataSource());
+  final isFake = ref.watch(useFakeProvider);
+  if (isFake) {
+    return UserRepositoryImpl(FakeUserDataSource());
+  }
+  final dio = ref.watch(dioProvider);
+  final api = ApiClient(dio);
+  return UserRepositoryImpl(RemoteUserDataSource(api));
 }
